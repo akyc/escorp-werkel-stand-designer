@@ -1,0 +1,31 @@
+<p>Выделите необходимые слои/группы/фреймы и нажмите «Поехали!»</p>
+<button id="copy">Поехали!</button>
+<div id="result">
+  <p></p>
+</div>
+<script>
+  document.getElementById('copy').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'copy' } }, '*')
+  }
+  function showResult(result) {
+    let resultTabel = document.createElement('table')
+    for (let product in result) {
+      let row = document.createElement('tr'),
+        codeCol = document.createElement('td'),
+        countCol = document.createElement('td');
+      codeCol.textContent = product;
+      countCol.textContent = result[product];
+      row.appendChild(codeCol)
+      row.appendChild(countCol)
+      resultTabel.appendChild(row)
+    }
+    document.querySelector('#result').innerHTML = "";
+    document.querySelector('#result').appendChild(resultTabel);
+  }
+  window.onmessage = event => {
+    const message = event.data.pluginMessage;
+    if (message.type === 'ok') {
+      showResult(message.value);
+    }
+  };
+</script>

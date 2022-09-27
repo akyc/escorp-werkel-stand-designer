@@ -1,8 +1,6 @@
-<p>Выделите необходимые слои/группы/фреймы и нажмите «Поехали!»</p>
+<p>Выделите необходимые слои и нажмите «Поехали!»</p>
 <button id="copy">Поехали!</button>
-<div id="result">
-  <p></p>
-</div>
+<div id="result"></div>
 <script>
   document.getElementById('copy').onclick = () => {
     parent.postMessage({ pluginMessage: { type: 'copy' } }, '*')

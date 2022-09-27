@@ -1,7 +1,7 @@
 {
-  "name": "escorp-copyLayersNames",
+  "name": "escorp-werkel-stand-designer",
   "version": "1.0.0",
-  "description": "Your Figma Plugin",
+  "description": "Figma Plugin",
   "main": "code.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",

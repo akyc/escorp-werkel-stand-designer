@@ -1,3 +1,5 @@
+
+
 figma.showUI(__html__, {"title": 'Конструктор стендов Werkel', 'width': 400, 'height': 600});
 figma.ui.onmessage = msg => {
   if(msg.type === 'copy'){
@@ -19,6 +21,9 @@ figma.ui.onmessage = msg => {
       type: 'ok',
       value: result,
     })
+  }
+  if(msg.type === 'createImage'){
+    console.log(msg.imgData)
   }
 };
 

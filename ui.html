@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://static.figma.com/api/figma-extension-api-0.0.1.css">
 <style>
   #loader {
     text-align: center;
@@ -13,17 +14,70 @@
     justify-content: center;
   }
 </style>
-
+<div id="loader">
+  <p>Загрузка...</p>
+</div>
 <p>Выделите необходимые механизмы и рамки для просчета и&nbsp;нажмите кнопку «Посчетать»</p>
 <button id="copy">Посчетать</button>
+<br>
+<a class="add" href="#" data-code="a059268">
+  <img src="https://eurosvet.info/catalog/images/products/preview/1a059268_0001.jpg" alt="" width="100">
+</a>
 <div id="result" style="margin-top: 20px;"></div>
-<div id="loader">
-  <p>Загрузка</p>
-</div>
+
 <script>
+  async function getEncodedImageFromURL(url) {
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      //img.src = 'https://api1.escorp.ru/image_test.php?url=' + url;
+      img.src = 'https://cdn1.ozone.ru/s3/multimedia-s/6398066932.jpg';
+      console.log(img.src)
+      // Some websites will allow loading of images into a canvas if set to Anonymous
+      //img.crossOrigin = "Anonymous";
+      img.setAttribute('crossorigin', 'anonymous');
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext("2d");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+        // canvas.toBlob(async (blob) => {
+        //   let blobBuffer = await blob.arrayBuffer();
+        //   resolve({
+        //     img: img,
+        //     data: new Uint8Array(blobBuffer)
+        //   });
+        // })
+        resolve({
+          img: img, data: ctx.getImageData(0, 0, canvas.width, canvas.height).data
+        })
+      }
+      // If an Anonymous image does not load, attempt to load it 
+      // cross origin using cors-anywhere
+      img.onerror = () => {
+        reject("Error fetching image");
+      }
+
+    });
+
+  }
   document.getElementById('copy').onclick = () => {
     parent.postMessage({ pluginMessage: { type: 'copy' } }, '*')
   }
+  document.querySelector('.add').addEventListener('click', function (e) {
+    e.preventDefault();
+    let link = `https://eurosvet.info/catalog/images/products/preview/1${this.dataset.code}_0001.jpg`
+    getEncodedImageFromURL(link).then(img => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'createImage',
+          imgData: img,
+        }
+      }, '*')
+    })
+  })
+
   let dbFile = document.createElement('script');
   dbFile.src = 'https://eurosvet.info/app/js/db.js';
   dbFile.charset = 'utf-8';
@@ -42,6 +96,8 @@
         countCol = document.createElement('td'),
         nameCol = document.createElement('td'),
         priceCol = document.createElement('td');
+
+      console.log(db['products'][product])
       nameCol.textContent = db['products'][product]['n']
       codeCol.textContent = product;
       countCol.textContent = result[product];
@@ -55,6 +111,8 @@
     document.querySelector('#result').innerHTML = "";
     document.querySelector('#result').appendChild(resultTabel);
   }
+
+
   window.onmessage = event => {
     const message = event.data.pluginMessage;
     if (message.type === 'ok') {
@@ -63,6 +121,9 @@
       } else {
         document.querySelector('#result').innerHTML = "Нет выделенных элементов";
       }
+    }
+    if (message.type === 'render') {
+
     }
   };
 </script>

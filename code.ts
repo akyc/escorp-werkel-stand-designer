@@ -65,12 +65,13 @@ figma.ui.onmessage = msg => {
         nodeIds.push(rect.id);
         (async () => {
           const text = figma.createText()
-          await figma.loadFontAsync({ family: "Inter", style: "Bold" })
+          await figma.loadFontAsync({ family: "Inter", style: "Regular" })
           text.characters = node.name
           text.fontSize = 36
           text.fills = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }]
           text.x = rect.x + 10
           text.y = rect.y + 10
+          console.log(text);
           nodeIds.push(text.id)
         })()
       }
@@ -78,7 +79,9 @@ figma.ui.onmessage = msg => {
     }
   }
   if(msg.type === 'delete-schema'){
-    
+    msg.list.forEach(el => {
+      figma.currentPage.findOne(n => n.id === el).remove()
+    })
   }
 };
 

@@ -52,7 +52,7 @@
   <div class="section controls">
     <button id="copy" class="button button--primary">Посчетать</button>
     <button id="draw-schema" class="button button--secondary">Нарисовать схему</button>
-    <button id="delete-schema" class="button button--secondary-destructive">Удалить схему</button>
+    <button id="delete-schema" class="button button--secondary-destructive hidden">Удалить схему</button>
   </div>
   <div class="section products">
 
@@ -86,6 +86,7 @@
   }
 
   document.getElementById('delete-schema').onclick = () => {
+    console.log(deleteNodeList)
     parent.postMessage({ pluginMessage: { type: 'delete-schema', 'list': deleteNodeList } }, '*')
   }
 
@@ -131,6 +132,10 @@
       } else {
         document.querySelector('#result').innerHTML = "Нет выделенных элементов";
       }
+    }
+    if (message.type === 'nodes-to-del') {
+      deleteNodeList = message.list
+      document.querySelector('#delete-schema').classList.remove('hidden')
     }
   };
 

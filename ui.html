@@ -1,5 +1,32 @@
-<link rel="stylesheet" href="https://static.figma.com/api/figma-extension-api-0.0.1.css">
+<link rel="stylesheet" href="https://eurosvet.ru/css/figma-plugin-ds/figma-plugin-ds.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
+
 <style>
+  .hidden {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .wrapper {
+    padding: 10px 20px;
+  }
+
+  .section {
+    margin-bottom: 30px;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: row;
+
+  }
+
+  .controls .button {
+    margin-right: 5px;
+
+  }
+
   #loader {
     text-align: center;
     position: absolute;
@@ -8,6 +35,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, .4);
+    backdrop-filter: blur(2px);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -15,101 +43,83 @@
   }
 </style>
 <div id="loader">
-  <p>Загрузка...</p>
+  <span class="loader-inner type--medium type--inverse"> Загрузка... </span>
 </div>
-<p>Выделите необходимые механизмы и рамки для просчета и&nbsp;нажмите кнопку «Посчетать»</p>
-<button id="copy">Посчетать</button>
-<br>
-<a class="add" href="#" data-code="a059268">
-  <img src="https://eurosvet.info/catalog/images/products/preview/1a059268_0001.jpg" alt="" width="100">
-</a>
-<div id="result" style="margin-top: 20px;"></div>
+<div class="wrapper">
+  <div class="section info">
+    <p class="type--small">Выделите необходимые механизмы и рамки для просчета и&nbsp;нажмите кнопку «Посчетать»</p>
+  </div>
+  <div class="section controls">
+    <button id="copy" class="button button--primary">Посчетать</button>
+    <button id="draw-schema" class="button button--secondary">Нарисовать схему</button>
+    <button id="delete-schema" class="button button--secondary-destructive">Удалить схему</button>
+  </div>
+  <div class="section products">
 
+    <a class="add" href="#" data-code="a051271">
+      <img src="https://eurosvet.info/catalog/images/products/preview/1a051271_0001.jpg" alt="" width="60">
+      <!-- a051271 -->
+    </a>
+    <a class="add" href="#" data-code="a050756">
+      <img src="https://eurosvet.info/catalog/images/products/preview/1a050756_0001.jpg" alt="" width="60">
+      <!-- a050756 -->
+    </a>
+  </div>
+  <div class="section type--small">
+    <table id="result" class="table"></table>
+  </div>
+</div>
+
+<script src="https://eurosvet.ru/css/figma-plugin-ds/iife/figma-plugin-ds.js"></script>
 <script>
-  async function getEncodedImageFromURL(url) {
+  let deleteNodeList = [];
+  document.addEventListener("DOMContentLoaded", function () {
+    loadDb()
+  })
 
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      //img.src = 'https://api1.escorp.ru/image_test.php?url=' + url;
-      img.src = 'https://cdn1.ozone.ru/s3/multimedia-s/6398066932.jpg';
-      console.log(img.src)
-      // Some websites will allow loading of images into a canvas if set to Anonymous
-      //img.crossOrigin = "Anonymous";
-      img.setAttribute('crossorigin', 'anonymous');
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext("2d");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        ctx.drawImage(img, 0, 0);
-        // canvas.toBlob(async (blob) => {
-        //   let blobBuffer = await blob.arrayBuffer();
-        //   resolve({
-        //     img: img,
-        //     data: new Uint8Array(blobBuffer)
-        //   });
-        // })
-        resolve({
-          img: img, data: ctx.getImageData(0, 0, canvas.width, canvas.height).data
-        })
-      }
-      // If an Anonymous image does not load, attempt to load it 
-      // cross origin using cors-anywhere
-      img.onerror = () => {
-        reject("Error fetching image");
-      }
-
-    });
-
-  }
   document.getElementById('copy').onclick = () => {
     parent.postMessage({ pluginMessage: { type: 'copy' } }, '*')
   }
-  document.querySelector('.add').addEventListener('click', function (e) {
-    e.preventDefault();
-    let link = `https://eurosvet.info/catalog/images/products/preview/1${this.dataset.code}_0001.jpg`
-    getEncodedImageFromURL(link).then(img => {
-      parent.postMessage({
-        pluginMessage: {
-          type: 'createImage',
-          imgData: img,
-        }
-      }, '*')
-    })
-  })
 
-  let dbFile = document.createElement('script');
-  dbFile.src = 'https://eurosvet.info/app/js/db.js';
-  dbFile.charset = 'utf-8';
-  document.body.appendChild(dbFile);
-  dbFile.onload = function () {
-    document.querySelector('#loader').remove()
+  document.getElementById('draw-schema').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'draw-schema' } }, '*')
+  }
+
+  document.getElementById('delete-schema').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'delete-schema', 'list': deleteNodeList } }, '*')
+  }
+
+  document.querySelectorAll('.add').forEach(el => el.addEventListener('click', function (e) { addProduct(this.dataset.code) }))
+
+  function addProduct(code) {
+    const link = 'https://minimir.ru/image/get?url=' + encodeURIComponent(`https://minimir.ru/images/stand-designer/${code}.png`);
+    Promise.all([getImage(link), getMeta(link)].map(p => p.catch(x => console.error(x)))).then(
+      r => {
+        let [image, size] = r;
+        parent.postMessage({ pluginMessage: { type: 'createImage', 'image': image, 'code': code, 'size': size } }, '*')
+      }
+    );
+  }
+
+  function loadDb() {
+    const dbFile = document.createElement('script');
+    dbFile.src = 'https://eurosvet.info/app/js/db.js';
+    dbFile.charset = 'utf-8'
+    document.body.appendChild(dbFile)
+    dbFile.onload = () => document.querySelector('#loader').classList.add('hidden')
   }
 
   function showResult(result) {
-    let resultTabel = document.createElement('table')
-    resultTabel.border = 1;
-    resultTabel.innerHTML = `<tr><td>Наименование</td><td>Код</td><td>Количество</td> <td>Стоимость</td></tr>`
-    for (let product in result) {
-      let row = document.createElement('tr'),
-        codeCol = document.createElement('td'),
-        countCol = document.createElement('td'),
-        nameCol = document.createElement('td'),
-        priceCol = document.createElement('td');
-
-      console.log(db['products'][product])
-      nameCol.textContent = db['products'][product]['n']
-      codeCol.textContent = product;
-      countCol.textContent = result[product];
-      priceCol.textContent = db['products'][product]['p']['1'] * result[product] + ' ₽'
-      row.appendChild(nameCol)
-      row.appendChild(codeCol)
-      row.appendChild(countCol)
-      row.appendChild(priceCol)
-      resultTabel.appendChild(row)
-    }
+    let tpl = '',
+      header = '<thead><tr><th scope="col">№</th><th scope="col">Наименование</th><th scope="col">Код</th><th scope="col">Кол-во</th><th scope="col">Цена</th></tr></thead>'
+    Object.keys(result).forEach((code, i) => {
+      if (code in db['products']) {
+        let [name, price] = [db['products'][code]['n'], db['products'][code]['p']['49']]
+        tpl += `<tr><th scope="row">${i + 1}</th><td>${name}</td><td>${code}</td><td nowrap>${result[code]}</td><td nowrap>${price}&nbsp;₽/шт.</td></tr>`
+      }
+    })
     document.querySelector('#result').innerHTML = "";
-    document.querySelector('#result').appendChild(resultTabel);
+    document.querySelector('#result').innerHTML = header + tpl;
   }
 
 
@@ -122,8 +132,24 @@
         document.querySelector('#result').innerHTML = "Нет выделенных элементов";
       }
     }
-    if (message.type === 'render') {
-
-    }
   };
+
+  function getMeta(url) {
+    const img = new Image()
+    img.src = url
+    return new Promise((resolve, reject) => {
+      img.onload = () => resolve([img.width, img.height])
+    })
+  }
+
+  async function getImage(imageURI) {
+    const resp = await fetch(imageURI);
+    const blob = await resp.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(new Uint8Array(reader.result));
+      reader.onerror = () => reject(new Error('Could not read from blob'));
+      reader.readAsArrayBuffer(blob);
+    });
+  }
 </script>

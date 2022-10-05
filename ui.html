@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://eurosvet.ru/css/figma-plugin-ds/figma-plugin-ds.css">
+<!-- <link rel="stylesheet" href="https://eurosvet.ru/css/figma-plugin-ds/figma-plugin-ds.css"> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
 
 <style>
@@ -14,17 +14,6 @@
 
   .section {
     margin-bottom: 30px;
-  }
-
-  .controls {
-    display: flex;
-    flex-direction: row;
-
-  }
-
-  .controls .button {
-    margin-right: 5px;
-
   }
 
   #loader {
@@ -46,48 +35,141 @@
   <span class="loader-inner type--medium type--inverse"> Загрузка... </span>
 </div>
 <div class="wrapper">
-  <div class="section info">
-    <p class="type--small">Выделите необходимые механизмы и рамки для просчета и&nbsp;нажмите кнопку «Посчетать»</p>
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <small>Добавить механизмы и рамки на страницу, выделить для просчета и&nbsp;нажать кнопку «Расчет»</small>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
-  <div class="section controls">
-    <button id="copy" class="button button--primary">Посчетать</button>
-    <button id="draw-schema" class="button button--secondary">Нарисовать схему</button>
-    <button id="delete-schema" class="button button--secondary-destructive hidden">Удалить схему</button>
-  </div>
-  <div class="section products">
 
-    <a class="add" href="#" data-code="a051271">
-      <img src="https://eurosvet.info/catalog/images/products/preview/1a051271_0001.jpg" alt="" width="60">
-      <!-- a051271 -->
-    </a>
-    <a class="add" href="#" data-code="a050756">
-      <img src="https://eurosvet.info/catalog/images/products/preview/1a050756_0001.jpg" alt="" width="60">
-      <!-- a050756 -->
-    </a>
+  <div class="btn-group btn-group-sm section" role="group" aria-label="Basic example">
+    <button id="calc-products" type="button" class="btn btn-outline-dark">Расчет</button>
+    <button id="draw-schema" type="button" class="btn btn-outline-dark">Нарисовать схему</button>
+    <button id="export-schema" type="button" class="btn btn-outline-dark" disabled>Экспорт схемы</button>
+    <button id="delete-schema" type="button" class="btn btn-outline-danger hidden">Удалить схему</button>
   </div>
+
   <div class="section type--small">
     <table id="result" class="table"></table>
   </div>
+
+  <div class="section products">
+    <ul class="nav" id="products_tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="mech-tab" data-bs-toggle="tab" data-bs-target="#mech-tab-pane" role="tab"
+          aria-controls="mech-tab-pane" aria-selected="true"><small>Механизмы</small></a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="frame-tab" data-bs-toggle="tab" data-bs-target="#frame-tab-pane" role="tab"
+          aria-controls="frame-tab-pane" aria-selected="false"><small>Рамки</small></a>
+      </li>
+      <li class="nav-item" role="presentation" disabled>
+        <a class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search-tab-pane" role="tab"
+          aria-controls="search-tab-pane" aria-selected="false" disabled><small>Поиск</small></a>
+      </li>
+    </ul>
+    <div class="tab-content pt-3" id="products_tabs-сontent">
+      <div class="tab-pane fade show active" id="mech-tab-pane" role="tabpanel" aria-labelledby="mech-tab" tabindex="0">
+        <div class="row">
+          <div class="col-6">
+            <a class="add text-decoration-none text-dark" href="#" data-code="a050756">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <img src="https://eurosvet.info/catalog/images/products/preview/1a050756_0001.jpg" width="100"
+                    alt="...">
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <b>a050756</b>
+                  <small>Выключатель двухклавишный графит рифленый</small>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="frame-tab-pane" role="tabpanel" aria-labelledby="frame-tab" tabindex="0">
+        <div class="row">
+          <div class="col-6">
+            <a class="add text-decoration-none text-dark" href="#" data-code="a037687">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <img src="https://eurosvet.info/catalog/images/products/preview/1a037687_0001.jpg" width="100"
+                    alt="...">
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <b>a037687</b>
+                  <small>Рамка из металла на 1 пост Palacio бронза/черный</small>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-6">
+            <a class="add text-decoration-none text-dark" href="#" data-code="a037682">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <img src="https://eurosvet.info/catalog/images/products/preview/1a037682_0001.jpg" width="100"
+                    alt="...">
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <b>a037682</b>
+                  <small>Рамка из металла на 1 пост Palacio бронза/белый</small>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-6">
+            <a class="add text-decoration-none text-dark" href="#" data-code="a051271">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <img src="https://eurosvet.info/catalog/images/products/preview/1a051271_0001.jpg" width="100"
+                    alt="...">
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <b>a051271</b>
+                  <small>Рамка из пластика на 5 постов Stream графит</small>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="search-tab-pane" role="tabpanel" aria-labelledby="search-tab" tabindex="0">
+        <div class="row">
+          <div class="col-12">
+            <input class="form-control form-control-lg" type="text" placeholder="Поиск..."
+              aria-label=".form-control-lg">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<script src="https://eurosvet.ru/css/figma-plugin-ds/iife/figma-plugin-ds.js"></script>
+<!-- <script src="https://eurosvet.ru/css/figma-plugin-ds/iife/figma-plugin-ds.js"></script> -->
+<script src="	https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  let deleteNodeList = [];
+  console.clear()
+  let shemaGroupId = null;
   document.addEventListener("DOMContentLoaded", function () {
-    loadDb()
+    loadDb('https://eurosvet.info/app/js/db.js').then(
+      resolve => { document.querySelector('#loader').classList.add('hidden') },
+      error => { console.error('Load db.js failed. ', error) }
+    )
   })
 
-  document.getElementById('copy').onclick = () => {
-    parent.postMessage({ pluginMessage: { type: 'copy' } }, '*')
+  document.getElementById('calc-products').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'calc-products' } }, '*')
   }
 
   document.getElementById('draw-schema').onclick = () => {
     parent.postMessage({ pluginMessage: { type: 'draw-schema' } }, '*')
   }
 
+  document.getElementById('export-schema').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'export-schema', 'shemaGroupId': shemaGroupId } }, '*')
+  }
+
   document.getElementById('delete-schema').onclick = () => {
-    console.log(deleteNodeList)
-    parent.postMessage({ pluginMessage: { type: 'delete-schema', 'list': deleteNodeList } }, '*')
+    parent.postMessage({ pluginMessage: { type: 'delete-schema', 'shemaGroupId': shemaGroupId } }, '*')
   }
 
   document.querySelectorAll('.add').forEach(el => el.addEventListener('click', function (e) { addProduct(this.dataset.code) }))
@@ -101,13 +183,19 @@
       }
     );
   }
+  function renderFrames() {
+    //db['categories']['3324']
+  }
 
-  function loadDb() {
-    const dbFile = document.createElement('script');
-    dbFile.src = 'https://eurosvet.info/app/js/db.js';
-    dbFile.charset = 'utf-8'
-    document.body.appendChild(dbFile)
-    dbFile.onload = () => document.querySelector('#loader').classList.add('hidden')
+  function loadDb(url) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.onload = resolve;
+      script.onerror = reject;
+      script.src = url;
+      script.charset = 'utf-8'
+      document.body.appendChild(script)
+    })
   }
 
   function showResult(result) {
@@ -126,15 +214,15 @@
 
   window.onmessage = event => {
     const message = event.data.pluginMessage;
-    if (message.type === 'ok') {
+    if (message.type === 'calc-result') {
       if (message.value) {
         showResult(message.value)
       } else {
-        document.querySelector('#result').innerHTML = "Нет выделенных элементов";
+        document.querySelector('#result').innerHTML = "Нет элементов для расчета";
       }
     }
     if (message.type === 'nodes-to-del') {
-      deleteNodeList = message.list
+      shemaGroupId = message.shemaGroupId
       document.querySelector('#delete-schema').classList.remove('hidden')
     }
   };

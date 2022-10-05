@@ -2,25 +2,22 @@
 
 figma.showUI(__html__, {"title": 'Конструктор стендов Werkel', 'width': 600, 'height': 700});
 figma.ui.onmessage = msg => {
-  if(msg.type === 'copy'){
-    let result = {}
-    if (figma.currentPage.selection.length) {
-      for (const node of figma.currentPage.selection) {
-        let code = node.name.replace(/^.*\(|\)$/gm, '')
-        if(code in result){
+  if(msg.type === 'calc-products'){
+    let result = {},
+    group = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
+    if (group) {
+      for (const node of group.children) {
+        let code = node.name
+        if(result && code in result){
           result[code]++
         } else {
           result[code] = 1
         }
       }
+      figma.ui.postMessage({ type: 'calc-result', value: result })
     } else {
-      result = null
+      figma.ui.postMessage({ type: 'calc-result', value: false })
     }
-    
-    figma.ui.postMessage({
-      type: 'ok',
-      value: result,
-    })
   }
   if(msg.type === 'createImage'){
     const image = figma.createImage(msg.image)
@@ -34,54 +31,72 @@ figma.ui.onmessage = msg => {
         scaleMode: 'FILL',
         imageHash: image.hash,
       }];
-      figma.currentPage.appendChild(rect);
+      let group = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
+      if(group){
+        group.appendChild(rect)
+      } else {
+        let group = figma.group([rect], figma.currentPage)
+          group.name = 'Расчет'
+      }
+      
       figma.currentPage.selection = [rect]
   }
   if(msg.type === 'draw-schema'){
-    
-    if (figma.currentPage.selection.length) {
-      let nodeIds = []
-      let gap = 500,
-      maxX = Math.max(...figma.currentPage.selection.map(el => el.x + el.width));
+    let group = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
+    if (group.children.length) {
+      let nodesList = [],
+          gap = 500,
+          maxX = Math.max(...group.children.map(node => node.x + node.width)),
+          promisesList = [];
 
-      for (const node of figma.currentPage.selection) {
-        const fill = {
-          type: 'SOLID',
-          opacity: 0,
-          color: {r:0,g:0,b:0},
-        }
-        const stroke = {
-          type: "SOLID",
-          color: {r: 0, g: 0, b: 0}
-
-        }
+      for (const node of group.children) {
         const rect = figma.createRectangle()
         rect.resize(node.width, node.height)
         rect.x = node.x + gap + maxX
         rect.y = node.y
-        rect.fills = [fill]
-        rect.strokes = [stroke]
+        rect.fills = [{
+          type: 'SOLID',
+          opacity: 0,
+          color: {r:0,g:0,b:0},
+        }]
+        rect.strokes = [{
+          type: "SOLID",
+          color: {r: 0, g: 0, b: 0}
+        }]
         rect.strokeWeight = 5;
-        nodeIds.push(rect.id);
+        nodesList.push(rect);
         (async () => {
           const text = figma.createText()
+          let promise = new Promise(resolve => resolve(nodesList.push(text)))
+          promisesList.push(promise)
           await figma.loadFontAsync({ family: "Inter", style: "Regular" })
           text.characters = node.name
-          text.fontSize = 36
+          text.fontSize = 38
           text.fills = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }]
           text.x = rect.x + 10
           text.y = rect.y + 10
-          console.log(text);
-          nodeIds.push(text.id)
         })()
       }
-      figma.ui.postMessage({ type: 'nodes-to-del', list: nodeIds })
+      Promise.all(promisesList).then(
+        resolve => {
+          let group = figma.group(nodesList, figma.currentPage)
+          group.name = 'Схема стенда'
+          figma.ui.postMessage({ type: 'nodes-to-del', 'shemaGroupId': group.id})
+        },
+        error => { console.error('Load font failed. ',error) })
+    }
+  }
+  if(msg.type === 'export-schema'){
+    let group = figma.currentPage.findOne(node => node.id === msg.shemaGroupId)
+    if(group){
+      group.exportAsync({
+          format: 'PDF',
+      })
     }
   }
   if(msg.type === 'delete-schema'){
-    msg.list.forEach(el => {
-      figma.currentPage.findOne(n => n.id === el).remove()
-    })
+    figma.currentPage.findOne(n => n.id === msg.shemaGroupId).remove()
   }
+
 };
 

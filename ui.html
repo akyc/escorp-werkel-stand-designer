@@ -1,4 +1,3 @@
-<!-- <link rel="stylesheet" href="https://eurosvet.ru/css/figma-plugin-ds/figma-plugin-ds.css"> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
 
 <style>
@@ -8,12 +7,26 @@
     visibility: hidden;
   }
 
-  .wrapper {
-    padding: 10px 20px;
-  }
+  .wrapper {}
 
   .section {
     margin-bottom: 30px;
+  }
+
+  #products_tabs {
+    border-top: 1.1px solid rgb(230, 230, 230);
+    border-bottom: 1.1px solid rgb(230, 230, 230);
+  }
+
+  #products_tabs .nav-link {
+    color: rgba(0, 0, 0, .7);
+    transition: color .5s ease;
+  }
+
+  #products_tabs .nav-link.active {
+    color: rgba(0, 0, 0, 1);
+    font-weight: 600;
+    padding: 8px 14px;
   }
 
   #loader {
@@ -34,117 +47,124 @@
 <div id="loader">
   <span class="loader-inner type--medium type--inverse"> Загрузка... </span>
 </div>
-<div class="wrapper">
-  <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <small>Добавить механизмы и рамки на страницу, выделить для просчета и&nbsp;нажать кнопку «Расчет»</small>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
+<div class="container-fluid">
+  <div class="wrapper">
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <small>Добавить механизмы и рамки на страницу, выделить для просчета и&nbsp;нажать кнопку «Расчет»</small>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
-  <div class="btn-group btn-group-sm section" role="group" aria-label="Basic example">
-    <button id="calc-products" type="button" class="btn btn-outline-dark">Расчет</button>
-    <button id="draw-schema" type="button" class="btn btn-outline-dark">Нарисовать схему</button>
-    <button id="export-schema" type="button" class="btn btn-outline-dark" disabled>Экспорт схемы</button>
-    <button id="delete-schema" type="button" class="btn btn-outline-danger hidden">Удалить схему</button>
-  </div>
+    <div class="btn-group btn-group-sm section" role="group" aria-label="Basic example">
+      <button id="calc-products" type="button" class="btn btn-outline-dark hidden">Расчет</button>
+      <button id="draw-schema" type="button" class="btn btn-outline-dark hidden">Нарисовать схему</button>
+      <button id="export-schema" type="button" class="btn btn-outline-dark hidden">Экспорт схемы</button>
+      <button id="delete-schema" type="button" class="btn btn-outline-danger hidden">Удалить схему</button>
+    </div>
 
-  <div class="section type--small">
-    <table id="result" class="table"></table>
-  </div>
+    <div class="section type--small">
+      <table id="result" class="table"></table>
+    </div>
 
-  <div class="section products">
-    <ul class="nav" id="products_tabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="mech-tab" data-bs-toggle="tab" data-bs-target="#mech-tab-pane" role="tab"
-          aria-controls="mech-tab-pane" aria-selected="true"><small>Механизмы</small></a>
-      </li>
-      <li class="nav-item" role="presentation">
-        <a class="nav-link" id="frame-tab" data-bs-toggle="tab" data-bs-target="#frame-tab-pane" role="tab"
-          aria-controls="frame-tab-pane" aria-selected="false"><small>Рамки</small></a>
-      </li>
-      <li class="nav-item" role="presentation" disabled>
-        <a class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search-tab-pane" role="tab"
-          aria-controls="search-tab-pane" aria-selected="false" disabled><small>Поиск</small></a>
-      </li>
-    </ul>
-    <div class="tab-content pt-3" id="products_tabs-сontent">
-      <div class="tab-pane fade show active" id="mech-tab-pane" role="tabpanel" aria-labelledby="mech-tab" tabindex="0">
-        <div class="row">
-          <div class="col-6">
-            <a class="add text-decoration-none text-dark" href="#" data-code="a050756">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <img src="https://eurosvet.info/catalog/images/products/preview/1a050756_0001.jpg" width="100"
-                    alt="...">
+    <div class="section products">
+      <ul class="nav" id="products_tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-link" id="stand-tab" data-bs-toggle="tab" data-bs-target="#stand-tab-pane" role="tab"
+            aria-controls="stand-tab-pane" aria-selected="false">Стенды</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-link active" id="mech-tab" data-bs-toggle="tab" data-bs-target="#mech-tab-pane"
+            role="tab" aria-controls="mech-tab-pane" aria-selected="true">Механизмы</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-link" id="frame-tab" data-bs-toggle="tab" data-bs-target="#frame-tab-pane" role="tab"
+            aria-controls="frame-tab-pane" aria-selected="false">Рамки</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search-tab-pane" role="tab"
+            aria-controls="search-tab-pane" aria-selected="false">Поиск</a>
+        </li>
+      </ul>
+      <div class="tab-content pt-3" id="products_tabs-сontent">
+        <div class="tab-pane fade show active" id="mech-tab-pane" role="tabpanel" aria-labelledby="mech-tab"
+          tabindex="0">
+          <div class="row">
+            <div class="col-6">
+              <a class="add text-decoration-none text-dark" href="#" data-code="a050756">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <img src="https://eurosvet.info/catalog/images/products/preview/1a050756_0001.jpg" width="100"
+                      alt="...">
+                  </div>
+                  <div class="flex-grow-1 ms-3">
+                    <b>a050756</b>
+                    <small>Выключатель двухклавишный графит рифленый</small>
+                  </div>
                 </div>
-                <div class="flex-grow-1 ms-3">
-                  <b>a050756</b>
-                  <small>Выключатель двухклавишный графит рифленый</small>
-                </div>
-              </div>
-            </a>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="tab-pane fade" id="frame-tab-pane" role="tabpanel" aria-labelledby="frame-tab" tabindex="0">
-        <div class="row">
-          <div class="col-6">
-            <a class="add text-decoration-none text-dark" href="#" data-code="a037687">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <img src="https://eurosvet.info/catalog/images/products/preview/1a037687_0001.jpg" width="100"
-                    alt="...">
+        <div class="tab-pane fade" id="frame-tab-pane" role="tabpanel" aria-labelledby="frame-tab" tabindex="0">
+          <div class="row">
+            <div class="col-6">
+              <a class="add text-decoration-none text-dark" href="#" data-code="a037687">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <img src="https://eurosvet.info/catalog/images/products/preview/1a037687_0001.jpg" width="100"
+                      alt="...">
+                  </div>
+                  <div class="flex-grow-1 ms-3">
+                    <b>a037687</b>
+                    <small>Рамка из металла на 1 пост Palacio бронза/черный</small>
+                  </div>
                 </div>
-                <div class="flex-grow-1 ms-3">
-                  <b>a037687</b>
-                  <small>Рамка из металла на 1 пост Palacio бронза/черный</small>
+              </a>
+            </div>
+            <div class="col-6">
+              <a class="add text-decoration-none text-dark" href="#" data-code="a037682">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <img src="https://eurosvet.info/catalog/images/products/preview/1a037682_0001.jpg" width="100"
+                      alt="...">
+                  </div>
+                  <div class="flex-grow-1 ms-3">
+                    <b>a037682</b>
+                    <small>Рамка из металла на 1 пост Palacio бронза/белый</small>
+                  </div>
                 </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-6">
-            <a class="add text-decoration-none text-dark" href="#" data-code="a037682">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <img src="https://eurosvet.info/catalog/images/products/preview/1a037682_0001.jpg" width="100"
-                    alt="...">
+              </a>
+            </div>
+            <div class="col-6">
+              <a class="add text-decoration-none text-dark" href="#" data-code="a051271">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <img src="https://eurosvet.info/catalog/images/products/preview/1a051271_0001.jpg" width="100"
+                      alt="...">
+                  </div>
+                  <div class="flex-grow-1 ms-3">
+                    <b>a051271</b>
+                    <small>Рамка из пластика на 5 постов Stream графит</small>
+                  </div>
                 </div>
-                <div class="flex-grow-1 ms-3">
-                  <b>a037682</b>
-                  <small>Рамка из металла на 1 пост Palacio бронза/белый</small>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-6">
-            <a class="add text-decoration-none text-dark" href="#" data-code="a051271">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <img src="https://eurosvet.info/catalog/images/products/preview/1a051271_0001.jpg" width="100"
-                    alt="...">
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <b>a051271</b>
-                  <small>Рамка из пластика на 5 постов Stream графит</small>
-                </div>
-              </div>
-            </a>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="tab-pane fade" id="search-tab-pane" role="tabpanel" aria-labelledby="search-tab" tabindex="0">
-        <div class="row">
-          <div class="col-12">
-            <input class="form-control form-control-lg" type="text" placeholder="Поиск..."
-              aria-label=".form-control-lg">
+        <div class="tab-pane fade" id="search-tab-pane" role="tabpanel" aria-labelledby="search-tab" tabindex="0">
+          <div class="row">
+            <div class="col-12">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="button-addon2">
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Поиск</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
-
 </div>
-
-<!-- <script src="https://eurosvet.ru/css/figma-plugin-ds/iife/figma-plugin-ds.js"></script> -->
 <script src="	https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   console.clear()
@@ -154,6 +174,7 @@
       resolve => { document.querySelector('#loader').classList.add('hidden') },
       error => { console.error('Load db.js failed. ', error) }
     )
+    parent.postMessage({ pluginMessage: { type: 'seek' } }, '*')
   })
 
   document.getElementById('calc-products').onclick = () => {
@@ -213,16 +234,30 @@
 
 
   window.onmessage = event => {
-    const message = event.data.pluginMessage;
-    if (message.type === 'calc-result') {
-      if (message.value) {
-        showResult(message.value)
+    const msg = event.data.pluginMessage;
+    if (msg.type === 'seek-result') {
+      const calcButtons = [document.querySelector('#calc-products'), document.querySelector('#draw-schema')],
+        schemaButtons = [document.querySelector('#export-schema'), document.querySelector('#delete-schema')];
+      if (msg.calc) {
+        calcButtons.forEach(btn => btn.classList.remove('hidden'))
+      } else {
+        calcButtons.forEach(btn => btn.classList.add('hidden'))
+      }
+      if (msg.schema) {
+        schemaButtons.forEach(btn => btn.classList.remove('hidden'))
+      } else {
+        schemaButtons.forEach(btn => btn.classList.add('hidden'))
+      }
+    }
+    if (msg.type === 'calc-result') {
+      if (msg.value) {
+        showResult(msg.value)
       } else {
         document.querySelector('#result').innerHTML = "Нет элементов для расчета";
       }
     }
-    if (message.type === 'nodes-to-del') {
-      shemaGroupId = message.shemaGroupId
+    if (msg.type === 'nodes-to-del') {
+      shemaGroupId = msg.shemaGroupId
       document.querySelector('#delete-schema').classList.remove('hidden')
     }
   };

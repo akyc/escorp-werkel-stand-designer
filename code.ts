@@ -9,12 +9,15 @@ figma.ui.onmessage = msg => {
     figma.ui.postMessage({ type: 'seek-result', 'calc': calc, 'schema': schema });
   }
   if(msg.type === 'calc-products'){
-    let result = {},
-    group = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
+    type Result = {
+      [key: string]: string
+    }
+    let result: Result = {},
+    group: SceneNode | null = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
     if (group) {
       for (const node of group.children) {
-        let code = node.name
-        if(result && code in result){
+        let code: string = node.name
+        if(code in result){
           result[code]++
         } else {
           result[code] = 1
@@ -25,6 +28,7 @@ figma.ui.onmessage = msg => {
       figma.ui.postMessage({ type: 'calc-result', value: false })
     }
   }
+
   if(msg.type === 'createImage'){
     const image = figma.createImage(msg.image)
     const rect = figma.createRectangle();
@@ -44,16 +48,16 @@ figma.ui.onmessage = msg => {
         let group = figma.group([rect], figma.currentPage)
           group.name = 'Расчет'
       }
-      
       figma.currentPage.selection = [rect]
   }
+
   if(msg.type === 'draw-schema'){
     let group = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
     if (group.children.length) {
-      let nodesList = [],
+      let nodesList:Array<NodeType> = [],
           gap = 500,
           maxX = Math.max(...group.children.map(node => node.x + node.width)),
-          promisesList = [];
+          promisesList:Array<any> = [];
 
       for (const node of group.children) {
         const rect = figma.createRectangle()
@@ -92,6 +96,7 @@ figma.ui.onmessage = msg => {
         error => { console.error('Load font failed. ',error) })
     }
   }
+
   if(msg.type === 'export-schema'){
     let group = figma.currentPage.findOne(node => node.id === msg.shemaGroupId)
     if(group){
@@ -103,9 +108,9 @@ figma.ui.onmessage = msg => {
       })()
     }
   }
-  if(msg.type === 'delete-schema'){
-    figma.currentPage.findOne(n => n.id === msg.shemaGroupId).remove()
-  }
 
+  if(msg.type === 'delete-schema'){
+    figma.currentPage.findOne(n => n.id === msg.shemaGroupId)?.remove()
+  }
 };
 

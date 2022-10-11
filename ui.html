@@ -7,12 +7,6 @@
     visibility: hidden;
   }
 
-  .wrapper {}
-
-  .section {
-    margin-bottom: 30px;
-  }
-
   #products_tabs {
     border-top: 1.1px solid rgb(230, 230, 230);
     border-bottom: 1.1px solid rgb(230, 230, 230);
@@ -49,12 +43,12 @@
 </div>
 <div class="container-fluid">
   <div class="wrapper">
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <!-- <div class="alert alert-warning alert-dismissible fade show" role="alert">
       <small>Добавить механизмы и рамки на страницу, выделить для просчета и&nbsp;нажать кнопку «Расчет»</small>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+    </div> -->
 
-    <div class="btn-group btn-group-sm section" role="group" aria-label="Basic example">
+    <div class="btn-group btn-group-sm section py-1" role="group" aria-label="Basic example">
       <button id="calc-products" type="button" class="btn btn-outline-dark hidden">Расчет</button>
       <button id="draw-schema" type="button" class="btn btn-outline-dark hidden">Нарисовать схему</button>
       <button id="export-schema" type="button" class="btn btn-outline-dark hidden">Экспорт схемы</button>
@@ -87,68 +81,10 @@
       <div class="tab-content pt-3" id="products_tabs-сontent">
         <div class="tab-pane fade show active" id="mech-tab-pane" role="tabpanel" aria-labelledby="mech-tab"
           tabindex="0">
-          <div class="row">
-            <div class="col-6">
-              <a class="add text-decoration-none text-dark" href="#" data-code="a050756">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0">
-                    <img src="https://eurosvet.info/catalog/images/products/preview/1a050756_0001.jpg" width="100"
-                      alt="...">
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <b>a050756</b>
-                    <small>Выключатель двухклавишный графит рифленый</small>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
+          <div class="row mechs-list"> </div>
         </div>
         <div class="tab-pane fade" id="frame-tab-pane" role="tabpanel" aria-labelledby="frame-tab" tabindex="0">
-          <div class="row">
-            <div class="col-6">
-              <a class="add text-decoration-none text-dark" href="#" data-code="a037687">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0">
-                    <img src="https://eurosvet.info/catalog/images/products/preview/1a037687_0001.jpg" width="100"
-                      alt="...">
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <b>a037687</b>
-                    <small>Рамка из металла на 1 пост Palacio бронза/черный</small>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="col-6">
-              <a class="add text-decoration-none text-dark" href="#" data-code="a037682">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0">
-                    <img src="https://eurosvet.info/catalog/images/products/preview/1a037682_0001.jpg" width="100"
-                      alt="...">
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <b>a037682</b>
-                    <small>Рамка из металла на 1 пост Palacio бронза/белый</small>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="col-6">
-              <a class="add text-decoration-none text-dark" href="#" data-code="a051271">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0">
-                    <img src="https://eurosvet.info/catalog/images/products/preview/1a051271_0001.jpg" width="100"
-                      alt="...">
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <b>a051271</b>
-                    <small>Рамка из пластика на 5 постов Stream графит</small>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
+          <div class="row frames-list"></div>
         </div>
         <div class="tab-pane fade" id="search-tab-pane" role="tabpanel" aria-labelledby="search-tab" tabindex="0">
           <div class="row">
@@ -171,9 +107,14 @@
   let shemaGroupId = null;
   document.addEventListener("DOMContentLoaded", function () {
     loadDb('https://eurosvet.info/app/js/db.js').then(
-      resolve => { document.querySelector('#loader').classList.add('hidden') },
+      resolve => {
+        document.querySelector('#loader').classList.add('hidden')
+        renderMechanisms()
+        renderFrames()
+      },
       error => { console.error('Load db.js failed. ', error) }
     )
+
     parent.postMessage({ pluginMessage: { type: 'seek' } }, '*')
   })
 
@@ -191,6 +132,7 @@
 
   document.getElementById('delete-schema').onclick = () => {
     parent.postMessage({ pluginMessage: { type: 'delete-schema', 'shemaGroupId': shemaGroupId } }, '*')
+    parent.postMessage({ pluginMessage: { type: 'seek' } }, '*')
   }
 
   document.querySelectorAll('.add').forEach(el => el.addEventListener('click', function (e) { addProduct(this.dataset.code) }))
@@ -201,11 +143,67 @@
       r => {
         let [image, size] = r;
         parent.postMessage({ pluginMessage: { type: 'createImage', 'image': image, 'code': code, 'size': size } }, '*')
+        parent.postMessage({ pluginMessage: { type: 'seek' } }, '*')
       }
     );
   }
+
   function renderFrames() {
     //db['categories']['3324']
+    let parent = document.querySelector('.frames-list'),
+      frames = ['a037682', 'a037687', 'a031796', 'a041171', 'a051269', 'a051271'];
+    frames.forEach(frame => {
+      let div = document.createElement('div'),
+        a = document.createElement('a');
+      div.classList.add('col-6', 'mb-2')
+      a.classList.add('add', 'text-decoration-none', 'text-dark')
+      a.dataset.code = frame
+      a.href = '#'
+      a.insertAdjacentHTML("beforeend", `
+        <div class="d-flex align-items-center">
+          <div class="flex-shrink-0">
+            <img src="https://eurosvet.info/catalog/images/products/preview/1${frame}_0001.jpg" width="70"
+              alt="">
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <b>${frame}</b>
+            <small>${db['products'][frame]['n']}</small>
+          </div>
+        </div>`)
+      a.addEventListener('click', function () {
+        addProduct(frame)
+      })
+      div.appendChild(a)
+      parent.appendChild(div)
+    })
+  }
+  function renderMechanisms() {
+    let parent = document.querySelector('.mechs-list'),
+      frames = ['a050756', 'a051120', 'a051125', 'a051126', 'a051135'];
+    frames.forEach(frame => {
+      let div = document.createElement('div'),
+        a = document.createElement('a');
+      div.classList.add('col-6', 'mb-2')
+      a.classList.add('add', 'text-decoration-none', 'text-dark')
+      a.dataset.code = frame
+      a.href = '#'
+      a.insertAdjacentHTML("beforeend", `
+        <div class="d-flex align-items-center">
+          <div class="flex-shrink-0">
+            <img src="https://eurosvet.info/catalog/images/products/preview/1${frame}_0001.jpg" width="70"
+              alt="">
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <b>${frame}</b>
+            <small>${db['products'][frame]['n']}</small>
+          </div>
+        </div>`)
+      a.addEventListener('click', function () {
+        addProduct(frame)
+      })
+      div.appendChild(a)
+      parent.appendChild(div)
+    })
   }
 
   function loadDb(url) {

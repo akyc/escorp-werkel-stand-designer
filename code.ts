@@ -9,7 +9,7 @@ figma.ui.onmessage = msg => {
   }
   if(msg.type === 'calc-products'){
     type Result = {
-      [key: string]: string
+      [key: string]: number
     }
     let result: Result = {},
     group: SceneNode | null = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")

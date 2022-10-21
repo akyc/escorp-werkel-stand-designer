@@ -37,6 +37,10 @@
     flex-direction: column;
     justify-content: center;
   }
+
+  a.disabled {
+    opacity: .2;
+  }
 </style>
 <div id="loader">
   <span class="loader-inner type--medium type--inverse"> Загрузка... </span>
@@ -147,63 +151,60 @@
       }
     );
   }
-
-  function renderFrames() {
-    //db['categories']['3324']
-    let parent = document.querySelector('.frames-list'),
-      frames = ['a037682', 'a037687', 'a031796', 'a041171', 'a051269', 'a051271'];
-    frames.forEach(frame => {
-      let div = document.createElement('div'),
-        a = document.createElement('a');
-      div.classList.add('col-6', 'mb-2')
-      a.classList.add('add', 'text-decoration-none', 'text-dark')
-      a.dataset.code = frame
-      a.href = '#'
-      a.insertAdjacentHTML("beforeend", `
+  function createMenu(id, parent) {
+    let subCategories = Object.keys(db['categories']).filter(category => +db['categories'][category]['pid'] === +id).sort((a, b) => db['categories'][a]['o'] - db['categories'][b]['o'])
+    subCategories.forEach(id => {
+      let { n } = db['categories'][id]
+      let products = db['product_to_categories_relations'][id].sort((a, b) => db['products'][a]['o'] - db['products'][b]['o'])
+      let tpl = `
+        <div class="col-12">
+          <a class="btn" data-bs-toggle="collapse" href="#collapse${id}" role="button" aria-expanded="false" aria-controls="collapse${id}">
+            ${n} 
+          </a>
+        </div>
+        <div class="collapse col-12 mb-2" id="collapse${id}">
+          <div class="row"></div>
+        </div>
+      `
+      parent.insertAdjacentHTML("beforeend", tpl)
+      products.forEach(product => {
+        hasReadyImage(product)
+        let div = document.createElement('div'),
+          a = document.createElement('a');
+        div.classList.add('col-6', 'mb-2')
+        a.classList.add('add', 'text-decoration-none', 'text-dark')
+        a.dataset.code = product
+        a.href = '#'
+        a.insertAdjacentHTML("beforeend", `
         <div class="d-flex align-items-center">
           <div class="flex-shrink-0">
-            <img src="https://eurosvet.info/catalog/images/products/preview/1${frame}_0001.jpg" width="70"
+            <img src="https://eurosvet.info/catalog/images/products/preview/1${product}_0001.jpg" width="70"
               alt="">
           </div>
           <div class="flex-grow-1 ms-3">
-            <b>${frame}</b>
-            <small>${db['products'][frame]['n']}</small>
+            <b>${product}</b>
+            <small>${db['products'][product]['n']}</small>
           </div>
         </div>`)
-      a.addEventListener('click', function () {
-        addProduct(frame)
+        a.addEventListener('click', function () {
+          addProduct(product)
+        })
+        div.appendChild(a)
+        parent.querySelector(`#collapse${id} .row`).appendChild(div)
       })
-      div.appendChild(a)
-      parent.appendChild(div)
     })
   }
+
+  function renderFrames() {
+    const parent = document.querySelector('.frames-list'),
+      framesCategoryId = '3324';
+    createMenu(framesCategoryId, parent)
+  }
+
   function renderMechanisms() {
-    let parent = document.querySelector('.mechs-list'),
-      frames = ['a050756', 'a051120', 'a051125', 'a051126', 'a051135'];
-    frames.forEach(frame => {
-      let div = document.createElement('div'),
-        a = document.createElement('a');
-      div.classList.add('col-6', 'mb-2')
-      a.classList.add('add', 'text-decoration-none', 'text-dark')
-      a.dataset.code = frame
-      a.href = '#'
-      a.insertAdjacentHTML("beforeend", `
-        <div class="d-flex align-items-center">
-          <div class="flex-shrink-0">
-            <img src="https://eurosvet.info/catalog/images/products/preview/1${frame}_0001.jpg" width="70"
-              alt="">
-          </div>
-          <div class="flex-grow-1 ms-3">
-            <b>${frame}</b>
-            <small>${db['products'][frame]['n']}</small>
-          </div>
-        </div>`)
-      a.addEventListener('click', function () {
-        addProduct(frame)
-      })
-      div.appendChild(a)
-      parent.appendChild(div)
-    })
+    const parent = document.querySelector('.mechs-list'),
+      mechsCategoryId = '3325';
+    createMenu(mechsCategoryId, parent)
   }
 
   function loadDb(url) {
@@ -242,6 +243,7 @@
         calcButtons.forEach(btn => btn.classList.add('hidden'))
       }
       if (msg.schema) {
+        shemaGroupId = msg.schema
         schemaButtons.forEach(btn => btn.classList.remove('hidden'))
       } else {
         schemaButtons.forEach(btn => btn.classList.add('hidden'))
@@ -265,9 +267,16 @@
     img.src = url
     return new Promise((resolve, reject) => {
       img.onload = () => resolve([img.width, img.height])
+      img.onerror = () => reject('false')
     })
   }
-
+  function hasReadyImage(product) {
+    const img = new Image();
+    img.src = 'https://minimir.ru/image/get?url=' + encodeURIComponent(`https://minimir.ru/images/stand-designer/${product}.png`)
+    img.onerror = function () {
+      document.querySelector(`[data-code=${product}]`).classList.add('disabled')
+    };
+  }
   async function getImage(imageURI) {
     const resp = await fetch(imageURI);
     const blob = await resp.blob();

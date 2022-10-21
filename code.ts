@@ -5,7 +5,6 @@ figma.ui.onmessage = msg => {
   if(msg.type === 'seek'){
     let calc = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет");
     let schema = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Схема стенда");
-
     figma.ui.postMessage({ type: 'seek-result', 'calc': calc, 'schema': schema });
   }
   if(msg.type === 'calc-products'){

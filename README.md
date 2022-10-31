@@ -1,9 +1,9 @@
 
 ## Конструктор стендов Werkel
 
-Плагин для Figma помогает разрабатывать стенды для шоурумов.
+Плагин для Figma помогает разрабатывать и согласовывать стенды для для клиентов [Werkel](https://werkel.ru/).
 
-[Библиотека механизмов и рамок](https://www.figma.com/file/tfuZKDdbEODhcnKXVnzaaN/werkel-stand-designer?node-id=0%3A1)
+[Библиотека стендов](https://www.figma.com/file/tfuZKDdbEODhcnKXVnzaaN/werkel-stand-designer?node-id=34%3A8)
 
 ## Разработка
 

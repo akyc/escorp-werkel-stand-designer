@@ -12,7 +12,7 @@ figma.ui.onmessage = msg => {
       [key: string]: number
     }
     let result: Result = {},
-    group: SceneNode | null = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
+    group: SceneNode | null = figma.currentPage.findOne((node:SceneNode) => node.type === "GROUP" && node.name === "Расчет")
     if (group) {
       for (const node of group.children) {
         let code: string = node.name
@@ -52,10 +52,10 @@ figma.ui.onmessage = msg => {
 
   if(msg.type === 'draw-schema'){
     let group = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
-    if (group.children.length) {
+    if (group?.children.length) {
       let nodesList:Array<NodeType> = [],
           gap = 500,
-          maxX = Math.max(...group.children.map(node => node.x + node.width)),
+          maxX = Math.max(...group?.children.map((node:SceneNode) => node.x + node.width)),
           promisesList:Array<any> = [];
 
       for (const node of group.children) {
@@ -96,17 +96,17 @@ figma.ui.onmessage = msg => {
     }
   }
 
-  if(msg.type === 'export-schema'){
-    let group = figma.currentPage.findOne(node => node.id === msg.shemaGroupId)
-    if(group){
-      (async () => {
-        const bytes = await group.exportAsync({
-          format: 'PNG',
-          constraint: { type: 'SCALE', value: 2 },
-        })
-      })()
-    }
-  }
+  // if(msg.type === 'export-schema'){
+  //   let group = figma.currentPage.findOne(node => node.id === msg.shemaGroupId)
+  //   if(group){
+  //     (async () => {
+  //       const bytes = await group.exportAsync({
+  //         format: 'PNG',
+  //         constraint: { type: 'SCALE', value: 2 },
+  //       })
+  //     })()
+  //   }
+  // }
 
   if(msg.type === 'delete-schema'){
     figma.currentPage.findOne(n => n.id === msg.shemaGroupId)?.remove()

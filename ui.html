@@ -41,6 +41,10 @@
   a.disabled {
     opacity: .2;
   }
+
+  .products a[aria-expanded="true"] svg {
+    transform: rotate(90deg);
+  }
 </style>
 <div id="loader">
   <span class="loader-inner type--medium type--inverse"> Загрузка... </span>
@@ -126,9 +130,9 @@
     parent.postMessage({ pluginMessage: { type: 'draw-schema' } }, '*')
   }
 
-  document.getElementById('export-schema').onclick = () => {
-    parent.postMessage({ pluginMessage: { type: 'export-schema', 'shemaGroupId': shemaGroupId } }, '*')
-  }
+  // document.getElementById('export-schema').onclick = () => {
+  //   parent.postMessage({ pluginMessage: { type: 'export-schema', 'shemaGroupId': shemaGroupId } }, '*')
+  // }
 
   document.getElementById('delete-schema').onclick = () => {
     parent.postMessage({ pluginMessage: { type: 'delete-schema', 'shemaGroupId': shemaGroupId } }, '*')
@@ -154,12 +158,19 @@
       let products = db['product_to_categories_relations'][id].sort((a, b) => db['products'][a]['o'] - db['products'][b]['o'])
       let tpl = `
         <div class="col-12">
-          <a class="btn" data-bs-toggle="collapse" href="#collapse${id}" role="button" aria-expanded="false" aria-controls="collapse${id}">
-            ${n} 
+          <a class="btn d-flex align-items-center" data-bs-toggle="collapse" href="#collapse${id}" role="button" aria-expanded="false" aria-controls="collapse${id}">
+            <span class="me-2">${n}</span>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512.001 512.001"  xml:space="preserve" style="width:12px;height:12px;">
+              <path style="fill:#212121;" d="M388.819,239.537L156.092,6.816c-9.087-9.089-23.824-9.089-32.912,0.002
+            c-9.087,9.089-9.087,23.824,0.002,32.912l216.27,216.266L123.179,472.272c-9.087,9.089-9.087,23.824,0.002,32.912
+            c4.543,4.544,10.499,6.816,16.455,6.816c5.956,0,11.913-2.271,16.457-6.817L388.819,272.45c4.366-4.364,6.817-10.283,6.817-16.455
+            C395.636,249.822,393.185,243.902,388.819,239.537z"/>
+            </svg>
           </a>
         </div>
         <div class="collapse col-12 mb-2" id="collapse${id}">
           <div class="row"></div>
+          <hr />
         </div>
       `
       parent.insertAdjacentHTML("beforeend", tpl)
@@ -232,7 +243,10 @@
     const msg = event.data.pluginMessage;
     if (msg.type === 'seek-result') {
       const calcButtons = [document.querySelector('#calc-products'), document.querySelector('#draw-schema')],
-        schemaButtons = [document.querySelector('#export-schema'), document.querySelector('#delete-schema')];
+        schemaButtons = [
+          //document.querySelector('#export-schema'), 
+          document.querySelector('#delete-schema')
+        ];
       if (msg.calc) {
         calcButtons.forEach(btn => btn.classList.remove('hidden'))
       } else {

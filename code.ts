@@ -5,7 +5,7 @@ figma.ui.onmessage = msg => {
   if(msg.type === 'seek'){
     let calc = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет");
     let schema = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Схема стенда");
-    figma.ui.postMessage({ type: 'seek-result', 'calc': calc, 'schema': schema });
+    figma.ui.postMessage({ type: 'seek-result', 'calc': calc, 'shemaGroupId': schema });
   }
   if(msg.type === 'calc-products'){
     type Result = {
@@ -48,20 +48,41 @@ figma.ui.onmessage = msg => {
           group.name = 'Расчет'
       }
       figma.currentPage.selection = [rect]
+      figma.ui.postMessage({ type: 'image-created', id: msg.id })
   }
 
   if(msg.type === 'draw-schema'){
     let group = figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Расчет")
-    if (group?.children.length) {
+    if (group.children.length) {
       let nodesList:Array<NodeType> = [],
           gap = 500,
-          maxX = Math.max(...group?.children.map((node:SceneNode) => node.x + node.width)),
+          minX = Math.min(...group.children.map((node:SceneNode) => node.x)),
+          maxX = Math.max(...group.children.map((node:SceneNode) => node.x + node.width)),
+          minY = Math.min(...group.children.map((node:SceneNode) => node.y)),
+          maxY = Math.max(...group.children.map((node:SceneNode) => node.y + node.height)),
+          widthSchema = maxX - minX + gap,
+          heigthSchema = maxY - minY + gap,
           promisesList:Array<any> = [];
-
-      for (const node of group.children) {
-        const rect = figma.createRectangle()
+      let rectSchema = figma.createRectangle()
+        rectSchema.resize(widthSchema, heigthSchema)
+        rectSchema.x = maxX + gap + (gap / 2) 
+        rectSchema.y = minY - (gap / 2)
+        rectSchema.fills = [{
+          type: 'SOLID',
+          opacity: 0,
+          color: {r:0,g:0,b:0},
+        }]
+        rectSchema.strokes = [{
+          type: "SOLID",
+          opacity: 0.6,
+          color: {r: 0, g: 0, b: 0}
+        }]
+        rectSchema.strokeWeight = 8;
+        nodesList.push(rectSchema);
+      for (let node of group.children) {
+        let rect = figma.createRectangle()
         rect.resize(node.width, node.height)
-        rect.x = node.x + gap + maxX
+        rect.x = node.x + gap + widthSchema
         rect.y = node.y
         rect.fills = [{
           type: 'SOLID',
@@ -80,7 +101,7 @@ figma.ui.onmessage = msg => {
           promisesList.push(promise)
           await figma.loadFontAsync({ family: "Inter", style: "Regular" })
           text.characters = node.name
-          text.fontSize = 38
+          text.fontSize = 42
           text.fills = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }]
           text.x = rect.x + 10
           text.y = rect.y + 10
@@ -92,7 +113,7 @@ figma.ui.onmessage = msg => {
           group.name = 'Схема стенда'
           figma.ui.postMessage({ type: 'nodes-to-del', 'shemaGroupId': group.id})
         },
-        error => { console.error('Load font failed. ',error) })
+        error => { console.error('Load font failed. ', error) })
     }
   }
 
@@ -109,7 +130,7 @@ figma.ui.onmessage = msg => {
   // }
 
   if(msg.type === 'delete-schema'){
-    figma.currentPage.findOne(n => n.id === msg.shemaGroupId)?.remove()
+    figma.currentPage.findOne(node => node.type === "GROUP" && node.name === "Схема стенда").remove()
   }
 };
 

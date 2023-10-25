@@ -166,11 +166,11 @@
   }
 
   function createMenu(id, parent) {
-    let subCategories = Object.keys(db['categories']).filter(category => db['categories'][category]['pid'] === +id).sort((a, b) => db['categories'][a]['o'] - db['categories'][b]['o'])
+    let subCategories = Object.keys(db['categories']).filter(category => db['categories'][category]['pid'] === +id).filter(el => el in db['categories']).sort((a, b) => db['categories'][a]['o'] - db['categories'][b]['o'])
     subCategories.forEach(id => {
       let { n } = db['categories'][id]
       if (db['product_to_categories_relations'][id] !== undefined) {
-        let products = db['product_to_categories_relations'][id].sort((a, b) => db['products'][a]['o'] - db['products'][b]['o'])
+        let products = db['product_to_categories_relations'][id].filter(el => el in db['products']).sort((a, b) => db['products'][a]['o'] - db['products'][b]['o'])
         let tpl = `
           <div class="col-12">
             <a class="btn d-flex align-items-center" data-bs-toggle="collapse" href="#collapse${id}" role="button" aria-expanded="false" aria-controls="collapse${id}">

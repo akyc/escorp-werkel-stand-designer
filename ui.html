@@ -45,9 +45,13 @@
   .products a[aria-expanded="true"] svg {
     transform: rotate(90deg);
   }
+
+  .text-info {
+    color: #886d4a !important;
+  }
 </style>
 <div id="loader">
-  <span class="loader-inner type--medium type--inverse"> Загрузка... </span>
+  <span class="loader-inner type--medium type--inverse"> Загрузка номенклатуры... </span>
 </div>
 <div class="container-fluid">
   <div class="wrapper">
@@ -117,12 +121,14 @@
   document.addEventListener("DOMContentLoaded", function () {
     loadDb('https://eurosvet.info/app/js/db.js').then(
       resolve => {
-        document.querySelector('#loader').classList.add('hidden')
+        //document.querySelector('#loader').classList.add('hidden')
+        document.querySelector('.loader-inner').innerHTML = 'Загрузка изображений ...'
         renderMechanisms()
         renderFrames()
       },
       error => { console.error('Load db.js failed. ', error) }
-    )
+    ).then()
+
   })
 
   document.getElementById('calc-products').onclick = () => {
@@ -189,8 +195,11 @@
           </div>
         `
         parent.insertAdjacentHTML("beforeend", tpl)
+        Promise.allSettled([...products].map(product => isReadyImage(product))).then(() => {
+          document.querySelector('#loader').classList.add('hidden')
+        })
         products.forEach(product => {
-          hasReadyImage(product)
+          //hasReadyImage(product)
           let div = document.createElement('div'),
             a = document.createElement('a');
           div.classList.add('col-6', 'mb-2')
@@ -359,10 +368,23 @@
   function hasReadyImage(product) {
     const img = new Image();
     img.src = 'https://minimir.ru/image/get?url=' + encodeURIComponent(`https://minimir.ru/images/stand-designer/${product}.png`)
-    img.onerror = function () {
+    img.onerror = function (e) {
       document.querySelector(`[data-code=${product}]`).classList.add('disabled')
     };
   }
+
+  function isReadyImage(product) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = 'https://minimir.ru/image/get?url=' + encodeURIComponent(`https://minimir.ru/images/stand-designer/${product}.png`)
+      img.onerror = () => {
+        document.querySelector(`[data-code=${product}]`).classList.add('disabled')
+        reject()
+      };
+      img.onload = () => resolve()
+    })
+  }
+
   async function getImage(imageURI) {
     const resp = await fetch(imageURI);
     const blob = await resp.blob();
